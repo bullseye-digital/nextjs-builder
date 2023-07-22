@@ -57,7 +57,7 @@ const getStaticProps = (project: ProjectState): GetStaticProps => async context 
   const { type } = result
   // @ts-ignore
   const ancestors = typeAncestry[type] ?? []
-  const stage = context.preview ? `DRAFT` : `LIVE`
+  const stage = context.draftMode ? `DRAFT` : `LIVE`
   const queryStr = getQueryForType(type)
   if (queryStr) {
     data.query = (await api.query(queryStr, { link: url, stage })) ?? null
