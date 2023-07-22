@@ -42,10 +42,10 @@
     "slash": "^4.0.0"
   },
   "peerDependencies": {
-    "@silverstripe/nextjs-toolkit": "*",
     "next": "^11.0"
   },
   "devDependencies": {
+    "@silverstripe/nextjs-toolkit": "*",
     "@types/glob": "^7.1.4",
     "@types/next": "^9.0.0",
     "@types/node": "^16.7.10",
