@@ -15,7 +15,9 @@
     "format": "prettier --write src/**/*.{ts,tsx}",
     "watch": "tsc --watch & tsc && tsc -t ES5 --outDir lib-es5 --watch",
     "publish-local": "npm run prepublishOnly && npm version prerelease --no-git-tag-version && npm pack && mkdirp .tarballs && mv gatsby-source-silverstripe-*.tgz .tarballs/ && echo 'published to .tarballs/'",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepublish": "npm run build",
+    "prepare": "npm run build"
   },
   "keywords": [
     "nextjs",
@@ -35,15 +37,13 @@
     "graphql": "^15.5.0",
     "html-react-parser": "^1.2.8",
     "node-fetch": "^2.6.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "slash": "^4.0.0"
   },
-  "peerDependencies": {
-    "@silverstripe/nextjs-toolkit": "*",
-    "next": "^11.0"
-  },
   "devDependencies": {
+    "next": "^13.0",
+    "@silverstripe/nextjs-toolkit": "*",
     "@types/glob": "^7.1.4",
     "@types/next": "^9.0.0",
     "@types/node": "^16.7.10",
