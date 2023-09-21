@@ -34,53 +34,62 @@ const getStaticProps = (project: ProjectState): GetStaticProps => async context 
   }
 
   const templates = Object.keys(availableTemplates)
-  const typeResolutionResult: CoreQueries = await api.query(
-    TYPE_RESOLUTION_QUERY,
-    { links: [url] }
-  )
+  
+  try {
+    const typeResolutionResult: CoreQueries = await api.query(
+      TYPE_RESOLUTION_QUERY,
+      { links: [url] }
+    )
 
-  if (
-    !typeResolutionResult ||
-    typeResolutionResult.typesForLinks.length === 0
-  ) {
+    if (
+      !typeResolutionResult ||
+      typeResolutionResult.typesForLinks.length === 0
+    ) {
+      return {
+        notFound: true,
+      }
+    }
+
+    const data = {
+      query: null,
+      extraProps: null,
+    }
+
+    const result = typeResolutionResult.typesForLinks[0]
+    const { type } = result
+    // @ts-ignore
+    const ancestors = typeAncestry[type] ?? []
+    const stage = context.draftMode ? `DRAFT` : `LIVE`
+    const queryStr = getQueryForType(type)
+    if (queryStr) {
+      data.query = (await api.query(queryStr, { link: url, stage })) ?? null
+    }
+
+    const propsKey = resolveAncestry(
+      type,
+      ancestors,
+      Object.keys(getPropsManifest)
+    )
+    // @ts-ignore
+    const propsFunc = propsKey ? getPropsManifest[propsKey] ?? null : null
+    if (propsFunc) {
+      data.extraProps = await propsFunc(data.query)
+    }
+    const componentProps = {
+      props: {
+        data,
+        type,
+        templates,
+      },
+    }
+    return componentProps
+
+  // might be not found  
+  } catch(err) {
     return {
       notFound: true,
     }
   }
-
-  const data = {
-    query: null,
-    extraProps: null,
-  }
-
-  const result = typeResolutionResult.typesForLinks[0]
-  const { type } = result
-  // @ts-ignore
-  const ancestors = typeAncestry[type] ?? []
-  const stage = context.draftMode ? `DRAFT` : `LIVE`
-  const queryStr = getQueryForType(type)
-  if (queryStr) {
-    data.query = (await api.query(queryStr, { link: url, stage })) ?? null
-  }
-
-  const propsKey = resolveAncestry(
-    type,
-    ancestors,
-    Object.keys(getPropsManifest)
-  )
-  // @ts-ignore
-  const propsFunc = propsKey ? getPropsManifest[propsKey] ?? null : null
-  if (propsFunc) {
-    data.extraProps = await propsFunc(data.query)
-  }
-  const componentProps = {
-    props: {
-      data,
-      type,
-      templates,
-    },
-  }
-  return componentProps
 }
 
 export default getStaticProps
