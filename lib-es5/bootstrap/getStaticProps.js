@@ -119,9 +119,13 @@ var getStaticProps = function (project) { return function (context) { return __a
                 ];
             case 7:
                 err_1 = _j.sent();
-                return [2 /*return*/, {
-                        notFound: true,
-                    }];
+                // @ts-ignore
+                if (err_1.message.includes('error-404')) {
+                    return [2 /*return*/, {
+                            notFound: true,
+                        }];
+                }
+                throw err_1;
             case 8: return [2 /*return*/];
         }
     });

@@ -86,9 +86,15 @@ const getStaticProps = (project: ProjectState): GetStaticProps => async context 
 
   // might be not found  
   } catch(err) {
-    return {
-      notFound: true,
+
+    // @ts-ignore
+    if( (err.message as string).includes('error-404') ) { 
+      return {
+        notFound: true,
+      }
     }
+    
+    throw err
   }
 }
 
