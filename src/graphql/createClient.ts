@@ -54,10 +54,6 @@ const createClient = (projectConfig: ProjectConfig) => {
       const json = await res.json()
 
       if (json.errors) {
-        if( json.errors[0].message && json.errors[0].message.includes('could not be found') ){
-          throw new Error('error-404')
-        }else{
-
         throw new Error(`
     There was a problem with your GraphQL query:
     
@@ -72,11 +68,7 @@ const createClient = (projectConfig: ProjectConfig) => {
     ${JSON.stringify(variables)}
     
                 `)
-
-        }
       }
-
-
       if (json.data) {
         return json.data
       }

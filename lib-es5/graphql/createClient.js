@@ -90,12 +90,7 @@ var createClient = function (projectConfig) {
                     case 3:
                         json = _c.sent();
                         if (json.errors) {
-                            if (json.errors[0].message && json.errors[0].message.includes('could not be found')) {
-                                throw new Error('error-404');
-                            }
-                            else {
-                                throw new Error("\n    There was a problem with your GraphQL query:\n    \n    ".concat(JSON.stringify(json.errors), "\n    \n    Query:\n    \n    ").concat(query, "\n    \n    Variables:\n    \n    ").concat(JSON.stringify(variables), "\n    \n                "));
-                            }
+                            throw new Error("\n    There was a problem with your GraphQL query:\n    \n    ".concat(JSON.stringify(json.errors), "\n    \n    Query:\n    \n    ").concat(query, "\n    \n    Variables:\n    \n    ").concat(JSON.stringify(variables), "\n    \n                "));
                         }
                         if (json.data) {
                             return [2 /*return*/, json.data];
