@@ -119,9 +119,13 @@ var getStaticProps = function (project) { return function (context) { return __a
                 ];
             case 7:
                 err_1 = _j.sent();
-                return [2 /*return*/, {
-                        notFound: true,
-                    }];
+                // @ts-ignore
+                if (typeof err_1.message !== 'undefined' && err_1.message.includes('could not be found')) {
+                    return [2 /*return*/, {
+                            notFound: true,
+                        }];
+                }
+                throw err_1;
             case 8: return [2 /*return*/];
         }
     });
