@@ -86,15 +86,9 @@ const getStaticProps = (project: ProjectState): GetStaticProps => async context 
 
   // might be not found  
   } catch(err) {
-
-    // @ts-ignore
-    if( typeof (err.message as string) !== 'undefined' && (err.message as string).includes('could not be found') ) { 
-      return {
-        notFound: true,
-      }
+    return {
+      notFound: true,
     }
-    
-    throw err
   }
 }
 
