@@ -44,7 +44,7 @@ var queries_1 = require("../build/queries");
 var createGetQueryForType_1 = __importDefault(require("../build/createGetQueryForType"));
 var createClient_1 = __importDefault(require("../graphql/createClient"));
 var getStaticProps = function (project) { return function (context) { return __awaiter(void 0, void 0, void 0, function () {
-    var getQueryForType, api, _a, getPropsManifest, typeAncestry, availableTemplates, page, url, templates, typeResolutionResult, data, result, type, ancestors, stage, queryStr, _b, propsKey, propsFunc, _c, componentProps;
+    var getQueryForType, api, _a, getPropsManifest, typeAncestry, availableTemplates, page, url, templates, typeResolutionResult, data, result, type, ancestors, stage, queryStr, _b, propsKey, propsFunc, _c, componentProps, err_1;
     var _d, _e, _f, _g, _h;
     return __generator(this, function (_j) {
         switch (_j.label) {
@@ -70,8 +70,11 @@ var getStaticProps = function (project) { return function (context) { return __a
                     throw new Error("No available templates found");
                 }
                 templates = Object.keys(availableTemplates);
-                return [4 /*yield*/, api.query(queries_1.TYPE_RESOLUTION_QUERY, { links: [url] })];
+                _j.label = 1;
             case 1:
+                _j.trys.push([1, 7, , 8]);
+                return [4 /*yield*/, api.query(queries_1.TYPE_RESOLUTION_QUERY, { links: [url] })];
+            case 2:
                 typeResolutionResult = _j.sent();
                 if (!typeResolutionResult ||
                     typeResolutionResult.typesForLinks.length === 0) {
@@ -88,22 +91,22 @@ var getStaticProps = function (project) { return function (context) { return __a
                 ancestors = (_f = typeAncestry[type]) !== null && _f !== void 0 ? _f : [];
                 stage = context.draftMode ? "DRAFT" : "LIVE";
                 queryStr = getQueryForType(type);
-                if (!queryStr) return [3 /*break*/, 3];
+                if (!queryStr) return [3 /*break*/, 4];
                 _b = data;
                 return [4 /*yield*/, api.query(queryStr, { link: url, stage: stage })];
-            case 2:
-                _b.query = (_g = (_j.sent())) !== null && _g !== void 0 ? _g : null;
-                _j.label = 3;
             case 3:
+                _b.query = (_g = (_j.sent())) !== null && _g !== void 0 ? _g : null;
+                _j.label = 4;
+            case 4:
                 propsKey = (0, nextjs_toolkit_1.resolveAncestry)(type, ancestors, Object.keys(getPropsManifest));
                 propsFunc = propsKey ? (_h = getPropsManifest[propsKey]) !== null && _h !== void 0 ? _h : null : null;
-                if (!propsFunc) return [3 /*break*/, 5];
+                if (!propsFunc) return [3 /*break*/, 6];
                 _c = data;
                 return [4 /*yield*/, propsFunc(data.query)];
-            case 4:
-                _c.extraProps = _j.sent();
-                _j.label = 5;
             case 5:
+                _c.extraProps = _j.sent();
+                _j.label = 6;
+            case 6:
                 componentProps = {
                     props: {
                         data: data,
@@ -111,7 +114,19 @@ var getStaticProps = function (project) { return function (context) { return __a
                         templates: templates,
                     },
                 };
-                return [2 /*return*/, componentProps];
+                return [2 /*return*/, componentProps
+                    // might be not found  
+                ];
+            case 7:
+                err_1 = _j.sent();
+                // @ts-ignore
+                if (typeof err_1.message !== 'undefined' && err_1.message.includes('could not be found')) {
+                    return [2 /*return*/, {
+                            notFound: true,
+                        }];
+                }
+                throw err_1;
+            case 8: return [2 /*return*/];
         }
     });
 }); }; };
