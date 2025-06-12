@@ -75,12 +75,34 @@ const getStaticProps = (project: ProjectState): GetStaticProps => async context 
     if (propsFunc) {
       data.extraProps = await propsFunc(data.query)
     }
+
+
+    let basePageData = null
+    if(data.query) {
+      for (const key in (data.query as any)) {
+        const leObj:any = (data.query as any)[key];
+        if(leObj.basePageData) {
+          basePageData = JSON.parse(leObj.basePageData)
+        }
+      }
+    }
+    if( basePageData!==null && stage!==`DRAFT`) {
+      if(basePageData.isPublishedInTheFuture) {
+        console.log('IS 404 ... ')
+        return {
+          notFound: true,
+        }
+      }
+    }
+
+
     const componentProps = {
       props: {
         data,
         type,
         templates,
       },
+      revalidate: 300 // 900 // 15 minutes
     }
     return componentProps
 

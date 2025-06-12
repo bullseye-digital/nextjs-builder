@@ -44,7 +44,7 @@ var queries_1 = require("../build/queries");
 var createGetQueryForType_1 = __importDefault(require("../build/createGetQueryForType"));
 var createClient_1 = __importDefault(require("../graphql/createClient"));
 var getStaticProps = function (project) { return function (context) { return __awaiter(void 0, void 0, void 0, function () {
-    var getQueryForType, api, _a, getPropsManifest, typeAncestry, availableTemplates, page, url, templates, typeResolutionResult, data, result, type, ancestors, stage, queryStr, _b, propsKey, propsFunc, _c, componentProps, err_1;
+    var getQueryForType, api, _a, getPropsManifest, typeAncestry, availableTemplates, page, url, templates, typeResolutionResult, data, result, type, ancestors, stage, queryStr, _b, propsKey, propsFunc, _c, basePageData, key, leObj, componentProps, err_1;
     var _d, _e, _f, _g, _h;
     return __generator(this, function (_j) {
         switch (_j.label) {
@@ -107,12 +107,30 @@ var getStaticProps = function (project) { return function (context) { return __a
                 _c.extraProps = _j.sent();
                 _j.label = 6;
             case 6:
+                basePageData = null;
+                if (data.query) {
+                    for (key in data.query) {
+                        leObj = data.query[key];
+                        if (leObj.basePageData) {
+                            basePageData = JSON.parse(leObj.basePageData);
+                        }
+                    }
+                }
+                if (basePageData !== null && stage !== "DRAFT") {
+                    if (basePageData.isPublishedInTheFuture) {
+                        console.log('IS 404 ... ');
+                        return [2 /*return*/, {
+                                notFound: true,
+                            }];
+                    }
+                }
                 componentProps = {
                     props: {
                         data: data,
                         type: type,
                         templates: templates,
                     },
+                    revalidate: 300 // 900 // 15 minutes
                 };
                 return [2 /*return*/, componentProps
                     // might be not found  
