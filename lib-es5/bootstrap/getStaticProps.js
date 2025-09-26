@@ -43,8 +43,33 @@ var nextjs_toolkit_1 = require("@silverstripe/nextjs-toolkit");
 var queries_1 = require("../build/queries");
 var createGetQueryForType_1 = __importDefault(require("../build/createGetQueryForType"));
 var createClient_1 = __importDefault(require("../graphql/createClient"));
+// Formats current time in a given IANA timezone as "YYYY-MM-DD HH:mm:SS"
+var nowInTimeZone = function (timeZone) {
+    var d = new Date();
+    // Get date/time parts in the target timezone
+    var dtf = new Intl.DateTimeFormat("en-NZ", {
+        timeZone: timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+    });
+    var parts = dtf.formatToParts(d);
+    var get = function (type) { var _a; return ((_a = parts.find(function (p) { return p.type === type; })) === null || _a === void 0 ? void 0 : _a.value) || "00"; };
+    var year = get("year");
+    var month = get("month");
+    var day = get("day");
+    var hour = get("hour");
+    var minute = get("minute");
+    var second = get("second");
+    // Return date-time without timezone, e.g. "2025-09-26 06:58:00"
+    return "".concat(year, "-").concat(month, "-").concat(day, " ").concat(hour, ":").concat(minute, ":").concat(second);
+};
 var getStaticProps = function (project) { return function (context) { return __awaiter(void 0, void 0, void 0, function () {
-    var getQueryForType, api, _a, getPropsManifest, typeAncestry, availableTemplates, page, url, templates, typeResolutionResult, data, result, type, ancestors, stage, queryStr, _b, propsKey, propsFunc, _c, basePageData, key, leObj, componentProps, err_1;
+    var getQueryForType, api, _a, getPropsManifest, typeAncestry, availableTemplates, page, url, templates, typeResolutionResult, data, result, type, ancestors, stage, now, queryStr, _b, propsKey, propsFunc, _c, basePageData, key, leObj, componentProps, err_1;
     var _d, _e, _f, _g, _h;
     return __generator(this, function (_j) {
         switch (_j.label) {
@@ -90,11 +115,16 @@ var getStaticProps = function (project) { return function (context) { return __a
                 type = result.type;
                 ancestors = (_f = typeAncestry[type]) !== null && _f !== void 0 ? _f : [];
                 stage = context.draftMode ? "DRAFT" : "LIVE";
+                now = nowInTimeZone("Pacific/Auckland");
                 queryStr = getQueryForType(type);
                 if (!queryStr) return [3 /*break*/, 4];
+                // Provide an optional `$now` variable for queries that use it.
+                // Servers ignore extra variables if not declared in the operation.
                 _b = data;
-                return [4 /*yield*/, api.query(queryStr, { link: url, stage: stage })];
+                return [4 /*yield*/, api.query(queryStr, { link: url, stage: stage, now: now })];
             case 3:
+                // Provide an optional `$now` variable for queries that use it.
+                // Servers ignore extra variables if not declared in the operation.
                 _b.query = (_g = (_j.sent())) !== null && _g !== void 0 ? _g : null;
                 _j.label = 4;
             case 4:

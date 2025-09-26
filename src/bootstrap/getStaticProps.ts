@@ -9,6 +9,35 @@ import createGetQueryForType from "../build/createGetQueryForType"
 import createClient from "../graphql/createClient"
 import { ProjectState } from "@silverstripe/nextjs-toolkit"
 
+// Formats current time in a given IANA timezone as "YYYY-MM-DD HH:mm:SS"
+const nowInTimeZone = (timeZone: string): string => {
+  const d = new Date()
+
+  // Get date/time parts in the target timezone
+  const dtf = new Intl.DateTimeFormat("en-NZ", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+  const parts = dtf.formatToParts(d)
+  const get = (type: string) => parts.find(p => p.type === type)?.value || "00"
+
+  const year = get("year")
+  const month = get("month")
+  const day = get("day")
+  const hour = get("hour")
+  const minute = get("minute")
+  const second = get("second")
+
+  // Return date-time without timezone, e.g. "2025-09-26 06:58:00"
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`
+}
+
 const getStaticProps = (project: ProjectState): GetStaticProps => async context => {
   const getQueryForType = createGetQueryForType(project)
   const api = createClient(project.projectConfig)
@@ -60,9 +89,12 @@ const getStaticProps = (project: ProjectState): GetStaticProps => async context 
     // @ts-ignore
     const ancestors = typeAncestry[type] ?? []
     const stage = context.draftMode ? `DRAFT` : `LIVE`
+    const now = nowInTimeZone("Pacific/Auckland")
     const queryStr = getQueryForType(type)
     if (queryStr) {
-      data.query = (await api.query(queryStr, { link: url, stage })) ?? null
+      // Provide an optional `$now` variable for queries that use it.
+      // Servers ignore extra variables if not declared in the operation.
+      data.query = (await api.query(queryStr, { link: url, stage, now })) ?? null
     }
 
     const propsKey = resolveAncestry(
